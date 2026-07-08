@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 218 75" role="img" aria-label="HOPE">
+  <!-- H -->
+  <rect fill="#39ff14" x="0" y="0" width="12" height="42"/>
+  <rect fill="#3a3a3a" x="0" y="42" width="12" height="33"/>
+  <rect fill="#39ff14" x="12" y="29" width="26" height="13"/>
+  <rect fill="#39ff14" x="38" y="0" width="12" height="75"/>
+  <!-- O -->
+  <rect fill="#39ff14" x="56" y="0" width="50" height="12"/>
+  <rect fill="#39ff14" x="56" y="63" width="50" height="12"/>
+  <rect fill="#39ff14" x="56" y="12" width="12" height="51"/>
+  <rect fill="#39ff14" x="94" y="12" width="12" height="51"/>
+  <!-- P -->
+  <rect fill="#39ff14" x="112" y="0" width="12" height="75"/>
+  <rect fill="#3a3a3a" x="124" y="0" width="26" height="12"/>
+  <rect fill="#3a3a3a" x="150" y="0" width="12" height="40"/>
+  <rect fill="#3a3a3a" x="124" y="28" width="26" height="12"/>
+  <!-- E -->
+  <rect fill="#3a3a3a" x="168" y="0" width="12" height="75"/>
+  <rect fill="#3a3a3a" x="180" y="0" width="38" height="12"/>
+  <rect fill="#3a3a3a" x="180" y="31" width="28" height="12"/>
+  <rect fill="#3a3a3a" x="180" y="63" width="38" height="12"/>
+</svg>

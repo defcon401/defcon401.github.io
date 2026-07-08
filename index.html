@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>dc401 - Rhode Island DEF CON Group</title>
+  <style>
+    :root {
+      --bg:      #0a0a0a;
+      --surface: #111;
+      --border:  #1e1e1e;
+      --green:   #39ff14;
+      --dim:     #555;
+      --muted:   #888;
+      --text:    #ccc;
+      --white:   #eee;
+      --gray:    #3a3a3a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 15px;
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+
+    a { color: var(--green); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 680px; margin: 0 auto; }
+
+
+    /* ===================== INTRO OVERLAY ===================== */
+
+    #intro {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.9s ease;
+    }
+    #intro.fade-out { opacity: 0; pointer-events: none; }
+
+    .intro-inner { text-align: center; }
+
+    #welcome {
+      font-size: 1rem;
+      letter-spacing: 2px;
+      color: var(--green);
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      transform: translateY(-14px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    #welcome.visible { opacity: 1; transform: translateY(0); }
+
+    /* Wraps welcome + chars so welcome left-aligns to the char block */
+    .chars-wrap {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    /* Character row — each slot holds one SVG glyph */
+    .chars {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .slot svg {
+      display: block;
+      height: clamp(3.5rem, 12vw, 6.5rem);
+      width:  calc(clamp(3.5rem, 12vw, 6.5rem) * 0.667);
+    }
+
+    /*
+     * .num-stroke  — the strokes that ARE the embedded number (4, 0, 1).
+     *                Visible as white from the start. Turn green on morph.
+     * .extra-stroke — strokes that complete the letter but aren't the number.
+     *                Hidden initially. Fade in as white on morph.
+     */
+    .num-stroke {
+      fill: var(--white);
+      transition: fill 0.45s ease;
+    }
+    .extra-stroke {
+      fill: var(--gray);
+      opacity: 0;
+      transition: opacity 0.45s ease;
+    }
+
+    .slot.morphed .num-stroke   { fill: var(--green); }
+    .slot.morphed .extra-stroke { opacity: 1; }
+
+    /* E: no number, just slides in */
+    #s4 svg {
+      opacity: 0;
+      transform: translateX(10px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    #s4.morphed svg { opacity: 1; transform: translateX(0); }
+
+    #unauth {
+      font-size: 0.75rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #a0a0a0;
+      margin-top: 0.7rem;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+    #unauth.hide { opacity: 0; }
+
+    .skip-hint {
+      position: fixed;
+      bottom: 1.5rem;
+      width: 100%;
+      text-align: center;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: var(--dim);
+      opacity: 0;
+      animation: hintIn 0.4s ease 1.2s forwards;
+    }
+    @keyframes hintIn { to { opacity: 1; } }
+
+
+    /* ===================== MAIN PAGE ===================== */
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo-dc {
+      font-size: 0.65rem;
+      color: var(--green);
+      letter-spacing: 2px;
+      margin-bottom: 0.15rem;
+    }
+
+    /* Static HOPE logo SVG in header */
+    .logo-svg {
+      display: block;
+      height: 3.5rem;
+      width: auto;
+      margin-bottom: 0.5rem;
+    }
+
+    .tagline {
+      color: var(--dim);
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    section { margin-bottom: 2.5rem; }
+
+    h2 {
+      color: var(--green);
+      font-size: 0.75rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      padding-bottom: 0.3rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    p { margin-bottom: 0.8rem; }
+
+    .meeting-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--green);
+      padding: 1rem 1.25rem;
+    }
+    .meeting-block .label {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin-bottom: 0.3rem;
+    }
+    .luma-embed {
+      margin-top: 0.75rem;
+      border: 1px solid var(--border);
+      background: #0f0f0f;
+      overflow: auto;
+      border-radius: 4px;
+      height: 225px;
+    }
+    .luma-embed iframe {
+      display: block;
+      width: 100%;
+      height: 450px;
+      border: 0;
+      background: #0f0f0f;
+    }
+
+    .cta-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+
+    .btn {
+      display: inline-block;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--green);
+      color: var(--green);
+      font-family: inherit;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      transition: background 0.15s, color 0.15s;
+    }
+    .btn:hover { background: var(--green); color: var(--bg); text-decoration: none; }
+    .btn.secondary { border-color: var(--dim); color: var(--muted); }
+    .btn.secondary:hover { background: var(--dim); color: var(--bg); }
+
+    .code {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      overflow-x: auto;
+    }
+    .code .prompt { color: var(--dim); }
+    .code .cmd    { color: var(--green); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+      margin-top: 3rem;
+      font-size: 0.75rem;
+      color: var(--dim);
+    }
+    footer a { color: var(--dim); }
+    footer a:hover { color: var(--green); }
+  </style>
+</head>
+<body>
+
+<!-- ===================== INTRO OVERLAY =====================
+     Block glyph guide (viewBox 0 0 50 75, column width 12):
+
+     4 → H:  num-strokes  = upper-left col + crossbar + right col  (stay, turn green)
+             extra-stroke = lower-left col                          (appears as white)
+
+     0 → O:  num-strokes  = all four sides of the ring              (stay, turn green)
+             (0 and O are the same shape — only color changes)
+
+     1 → P:  num-stroke   = left vertical                          (stays, turns green)
+             extra-strokes = bowl top + right + bottom              (appear as white)
+
+     E:      no number — entire glyph slides in as white
+-->
+<div id="intro" aria-hidden="true">
+  <div class="intro-inner">
+
+    <div class="chars-wrap">
+    <div id="welcome">Welcome to: dc</div>
+
+    <div class="chars">
+
+      <!-- 4 → H -->
+      <div class="slot" id="s1">
+        <svg viewBox="0 0 50 75" xmlns="http://www.w3.org/2000/svg">
+          <rect class="num-stroke"   x="0"  y="0"  width="12" height="42"/><!-- upper-left (part of 4) -->
+          <rect class="num-stroke"   x="12" y="29" width="26" height="13"/><!-- crossbar gap (part of 4) -->
+          <rect class="num-stroke"   x="38" y="0"  width="12" height="75"/><!-- right col (part of 4) -->
+          <rect class="extra-stroke" x="0"  y="42" width="12" height="33"/><!-- lower-left leg (extra, completes H) -->
+        </svg>
+      </div>
+
+      <!-- 0 → O -->
+      <div class="slot" id="s2">
+        <svg viewBox="0 0 50 75" xmlns="http://www.w3.org/2000/svg">
+          <rect class="num-stroke" x="0"  y="0"  width="50" height="12"/><!-- top -->
+          <rect class="num-stroke" x="0"  y="63" width="50" height="12"/><!-- bottom -->
+          <rect class="num-stroke" x="0"  y="12" width="12" height="51"/><!-- left -->
+          <rect class="num-stroke" x="38" y="12" width="12" height="51"/><!-- right -->
+        </svg>
+      </div>
+
+      <!-- 1 → P -->
+      <div class="slot" id="s3">
+        <svg viewBox="0 0 50 75" xmlns="http://www.w3.org/2000/svg">
+          <rect class="num-stroke"   x="0"  y="0"  width="12" height="75"/><!-- left vertical (the 1) -->
+          <rect class="extra-stroke" x="12" y="0"  width="26" height="12"/><!-- bowl top (extra) -->
+          <rect class="extra-stroke" x="38" y="0"  width="12" height="40"/><!-- bowl right (extra) -->
+          <rect class="extra-stroke" x="12" y="28" width="26" height="12"/><!-- bowl bottom (extra) -->
+        </svg>
+      </div>
+
+      <!-- E (no number — slides in) -->
+      <div class="slot" id="s4">
+        <svg viewBox="0 0 50 75" xmlns="http://www.w3.org/2000/svg">
+          <rect fill="#3a3a3a" x="0"  y="0"  width="12" height="75"/><!-- left -->
+          <rect fill="#3a3a3a" x="12" y="0"  width="38" height="12"/><!-- top -->
+          <rect fill="#3a3a3a" x="12" y="31" width="28" height="12"/><!-- middle -->
+          <rect fill="#3a3a3a" x="12" y="63" width="38" height="12"/><!-- bottom -->
+        </svg>
+      </div>
+
+    </div>
+    </div><!-- /.chars-wrap -->
+
+    <div id="unauth">Unauthorized</div>
+
+  </div>
+  <div class="skip-hint">press any key or click to skip</div>
+</div>
+
+
+<!-- ===================== MAIN PAGE ===================== -->
+<div class="container">
+
+  <header>
+    <!--
+      Static HOPE logo — same block glyphs as the animation, frozen in final state.
+      4-parts (H upper-left+crossbar+right, whole O, P left-vert) = green.
+      Extra parts (H lower-left, P bowl, E) = white/dim.
+      Characters at x=0, 56, 112, 168. Total viewBox 218×75.
+    -->
+    <div class="logo-dc">dc</div>
+    <svg class="logo-svg" viewBox="0 0 218 75" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="HOPE">
+      <!-- H -->
+      <rect fill="#39ff14" x="0"   y="0"  width="12" height="42"/><!-- upper-left -->
+      <rect fill="#3a3a3a"    x="0"   y="42" width="12" height="33"/><!-- lower-left -->
+      <rect fill="#39ff14" x="12"  y="29" width="26" height="13"/><!-- crossbar -->
+      <rect fill="#39ff14" x="38"  y="0"  width="12" height="75"/><!-- right -->
+      <!-- O -->
+      <rect fill="#39ff14" x="56"  y="0"  width="50" height="12"/>
+      <rect fill="#39ff14" x="56"  y="63" width="50" height="12"/>
+      <rect fill="#39ff14" x="56"  y="12" width="12" height="51"/>
+      <rect fill="#39ff14" x="94"  y="12" width="12" height="51"/>
+      <!-- P -->
+      <rect fill="#39ff14" x="112" y="0"  width="12" height="75"/><!-- left vertical -->
+      <rect fill="#3a3a3a"    x="124" y="0"  width="26" height="12"/><!-- bowl top -->
+      <rect fill="#3a3a3a"    x="150" y="0"  width="12" height="40"/><!-- bowl right -->
+      <rect fill="#3a3a3a"    x="124" y="28" width="26" height="12"/><!-- bowl bottom -->
+      <!-- E -->
+      <rect fill="#3a3a3a"    x="168" y="0"  width="12" height="75"/>
+      <rect fill="#3a3a3a"    x="180" y="0"  width="38" height="12"/>
+      <rect fill="#3a3a3a"    x="180" y="31" width="28" height="12"/>
+      <rect fill="#3a3a3a"    x="180" y="63" width="38" height="12"/>
+    </svg>
+
+    <div class="tagline">A taut anchor in today's choppy digital waters.</div>
+  </header>
+
+  <section>
+    <h2>Who we are</h2>
+    <p>
+      dc401 is Rhode Island's DEF CON Group — a loose collective of curious people who are also curious.
+      We meet sporadically to share projects, trash talk vendors and generally talk about security.
+      From n00b to 313373 and everyone in between the only requirement is curiosity, all are welcome.
+    </p>
+    <p>
+      Note: We are not affiliated with Hackers on Planet Earth (HOPE); "Hope" has been Rhode Island's official motto since 1664 so you know...technically they stole that from us.
+    </p>
+  </section>
+
+  <section>
+    <h2>Upcoming meetings</h2>
+    <div class="meeting-block">
+      <div class="label">Upcoming</div>
+      <div class="luma-embed">
+        <iframe
+          title="dc401 calendar on Luma"
+          src="https://luma.com/embed/calendar/cal-iovrzqTVsisc4Q4/events"
+          width="600"
+          height="450"
+          frameborder="0"
+          loading="lazy"
+          style="border: 1px solid #bfcbda88; border-radius: 4px;"
+          allowfullscreen=""
+          aria-hidden="false"
+          tabindex="0"
+        ></iframe>
+      </div>
+    </div>
+    <div class="cta-row">
+      <a class="btn" href="https://lu.ma/dc401" target="_blank" rel="noopener">Open Calendar</a>
+      <a class="btn secondary" href="./discord/">Discord coming soon..maybe</a>
+    </div>
+  </section>
+
+  <section>
+    <h2>What we do</h2>
+    <div class="code">
+      <div><span class="prompt">$ </span><span class="cmd">./dc401 --topics</span></div>
+      <div>reverse engineering</div>
+      <div>bug bounty</div>
+      <div>hardware hacking</div>
+      <div>web app security</div>
+      <div>CTF</div>
+      <div>cryptography</div>
+      <div>OSINT</div>
+      <div>whatever you've got</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Speak or present</h2>
+    <p>
+      If you've got a project, finding, tool, or idea worth talking through, we want to hear it.
+      Lightning talks and longer presentations both fit.
+    </p>
+    <div class="cta-row">
+      <a class="btn secondary" href="mailto:hello@dc401.net">Email us about a talk</a>
+    </div>
+  </section>
+
+  <footer>
+    <a href="https://lu.ma/dc401" target="_blank" rel="noopener">events</a> ·
+    <a href="mailto:hello@dc401.net">hello@dc401.net</a>
+    <br><br>
+    dc401 · Providence RI
+  </footer>
+
+</div>
+
+
+<script>
+(function () {
+  var intro   = document.getElementById('intro');
+  var welcome = document.getElementById('welcome');
+  var unauth  = document.getElementById('unauth');
+  var slots   = ['s1','s2','s3','s4'].map(function (id) {
+    return document.getElementById(id);
+  });
+
+  var navEntry = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+  var isReload = navEntry ? navEntry.type === 'reload' : (performance.navigation && performance.navigation.type === 1);
+  var done = false;
+  var timers = [];
+
+  function dismiss() {
+    if (done) return;
+    done = true;
+    timers.forEach(clearTimeout);
+    intro.classList.add('fade-out');
+    setTimeout(function () { intro.style.display = 'none'; }, 900);
+  }
+
+  function at(ms, fn) { timers.push(setTimeout(fn, ms)); }
+
+  if (isReload) {
+    intro.style.display = 'none';
+    return;
+  }
+
+  at(1700, function () { slots[0].classList.add('morphed'); }); // 4 → H (extra leg appears, 4-parts turn green)
+  at(2050, function () { slots[1].classList.add('morphed'); }); // 0 → O (turns green)
+  at(2400, function () { slots[2].classList.add('morphed'); }); // 1 → P (bowl appears, 1-part turns green)
+  at(2750, function () { slots[3].classList.add('morphed'); }); // E slides in
+  at(3100, function () { unauth.classList.add('hide'); });
+  at(3400, function () { welcome.classList.add('visible'); });
+  at(5000, dismiss);
+
+  document.addEventListener('keydown', dismiss);
+  intro.addEventListener('click', dismiss);
+}());
+</script>
+
+</body>
+</html>
