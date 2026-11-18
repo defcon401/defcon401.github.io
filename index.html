@@ -177,33 +177,20 @@
 
     p { margin-bottom: 0.8rem; }
 
-    .meeting-block {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--green);
-      padding: 1rem 1.25rem;
-    }
-    .meeting-block .label {
-      font-size: 0.7rem;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--dim);
-      margin-bottom: 0.3rem;
-    }
     .luma-embed {
-      margin-top: 0.75rem;
-      border: 1px solid var(--border);
       background: #0f0f0f;
-      overflow: auto;
+      overflow: hidden;
       border-radius: 4px;
-      height: 225px;
     }
     .luma-embed iframe {
       display: block;
       width: 100%;
-      height: 450px;
+      height: 260px;
       border: 0;
       background: #0f0f0f;
+    }
+    @media (max-width: 300px) {
+      .luma-embed iframe { height: 300px; }
     }
 
     .cta-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
@@ -220,19 +207,6 @@
       transition: background 0.15s, color 0.15s;
     }
     .btn:hover { background: var(--green); color: var(--bg); text-decoration: none; }
-    .btn.secondary { border-color: var(--dim); color: var(--muted); }
-    .btn.secondary:hover { background: var(--dim); color: var(--bg); }
-
-    .code {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 0.75rem 1rem;
-      font-size: 0.85rem;
-      color: var(--muted);
-      overflow-x: auto;
-    }
-    .code .prompt { color: var(--dim); }
-    .code .cmd    { color: var(--green); }
 
     footer {
       border-top: 1px solid var(--border);
@@ -371,8 +345,7 @@
   <section>
     <h2>Chat with us</h2>
     <p>
-      Our digital home is the <strong>InfoSec Boston</strong> Slack, in <strong>#dc401-rhodeisland</strong>.
-      Join us to keep in touch with fellow dc401 folks between meetings.
+      Join the <strong>#dc401-rhodeisland</strong> channel in the <strong>Boston InfoSec</strong> Slack to keep in touch between meetings.
     </p>
     <p>
       If the invite has expired, email <a href="mailto:hello@dc401.net">hello@dc401.net</a> for a fresh link.
@@ -384,22 +357,18 @@
 
   <section>
     <h2>Upcoming meetings</h2>
-    <div class="meeting-block">
-      <div class="label">Upcoming</div>
-      <div class="luma-embed">
-        <iframe
-          title="dc401 calendar on Luma"
-          src="https://luma.com/embed/calendar/cal-iovrzqTVsisc4Q4/events?lt=dark"
-          width="600"
-          height="450"
-          frameborder="0"
-          loading="lazy"
-          style="border: 1px solid #bfcbda88; border-radius: 4px;"
-          allowfullscreen=""
-          aria-hidden="false"
-          tabindex="0"
-        ></iframe>
-      </div>
+    <div class="luma-embed">
+      <iframe
+        title="dc401 calendar on Luma"
+        src="https://luma.com/embed/calendar/cal-iovrzqTVsisc4Q4/events?lt=dark"
+        width="600"
+        height="260"
+        frameborder="0"
+        loading="lazy"
+        allowfullscreen=""
+        aria-hidden="false"
+        tabindex="0"
+      ></iframe>
     </div>
     <div class="cta-row">
       <a class="btn" href="https://lu.ma/dc401" target="_blank" rel="noopener">Open Calendar</a>
@@ -407,28 +376,13 @@
   </section>
 
   <section>
-    <h2>What we do</h2>
-    <div class="code">
-      <div><span class="prompt">$ </span><span class="cmd">./dc401 --topics</span></div>
-      <div>reverse engineering</div>
-      <div>bug bounty</div>
-      <div>hardware hacking</div>
-      <div>web app security</div>
-      <div>CTF</div>
-      <div>cryptography</div>
-      <div>OSINT</div>
-      <div>whatever you've got</div>
-    </div>
-  </section>
-
-  <section>
     <h2>Speak or present</h2>
     <p>
-      If you've got a project, finding, tool, or idea worth talking through, we want to hear it.
+      If you have a project, finding, tool, or idea worth talking through, we want to hear it.
       Lightning talks and longer presentations both fit.
     </p>
     <div class="cta-row">
-      <a class="btn secondary" href="mailto:hello@dc401.net">Email us about a talk</a>
+      <a class="btn" href="mailto:hello@dc401.net">Email us about a talk</a>
     </div>
   </section>
 
