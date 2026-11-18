@@ -190,6 +190,15 @@
       color: var(--dim);
       margin-bottom: 0.3rem;
     }
+    .meeting-poster {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0.75rem 0;
+      border: 1px solid var(--border);
+    }
+    .meeting-meta { color: var(--muted); }
+    .calendar-block { margin-top: 1rem; }
     .luma-embed {
       margin-top: 0.75rem;
       border: 1px solid var(--border);
@@ -369,9 +378,31 @@
   </section>
 
   <section>
+    <h2>Our digital home</h2>
+    <p>
+      Find dc401 on Slack for conversation between meetings and updates from the group.
+    </p>
+    <div class="cta-row">
+      <a class="btn" href="mailto:hello@dc401.net?subject=dc401%20Slack%20invite">Ask for a Slack invite</a>
+    </div>
+  </section>
+
+  <section>
     <h2>Upcoming meetings</h2>
-    <div class="meeting-block">
-      <div class="label">Upcoming</div>
+    <div class="meeting-block" id="featured-meeting">
+      <div class="label">Next meeting</div>
+      <a href="https://www.meetup.com/defcon401/events/317474320/" target="_blank" rel="noopener">
+        <img class="meeting-poster" src="assets/meeting_thumbnails/november2026.jpeg" alt="DC401 November meeting poster with a group gathered around a fall table">
+      </a>
+      <p><strong>November Presentation</strong> — Blorfus: “CYDs: Trust Your Gadget Lust”</p>
+      <p class="meeting-meta">Monday, November 30, 2026 · 6:30–8:30 p.m. · The XO Bar, 125 N Main St, Providence</p>
+      <p>Cheap Yellow Displays for pentesting, fun, and counter-intelligence.</p>
+      <div class="cta-row">
+        <a class="btn" href="https://www.meetup.com/defcon401/events/317474320/" target="_blank" rel="noopener">Event details</a>
+      </div>
+    </div>
+    <div class="meeting-block calendar-block">
+      <div class="label">Calendar</div>
       <div class="luma-embed">
         <iframe
           title="dc401 calendar on Luma"
@@ -420,6 +451,8 @@
 
   <footer>
     <a href="https://lu.ma/dc401" target="_blank" rel="noopener">events</a> ·
+    <a href="https://www.meetup.com/defcon401/" target="_blank" rel="noopener">meetup</a> ·
+    <a href="mailto:hello@dc401.net?subject=dc401%20Slack%20invite">slack invite</a> ·
     <a href="mailto:hello@dc401.net">hello@dc401.net</a>
     <br><br>
     dc401 · Providence RI
@@ -430,6 +463,11 @@
 
 <script>
 (function () {
+  // The calendar stays current; retire the static featured event after it ends.
+  if (Date.now() > Date.parse('2026-12-01T00:30:00Z')) {
+    document.getElementById('featured-meeting').hidden = true;
+  }
+
   var intro   = document.getElementById('intro');
   var welcome = document.getElementById('welcome');
   var unauth  = document.getElementById('unauth');
